@@ -95,7 +95,12 @@
             }
         }
 
-        public bool SeqIdMode { get; set; }
+        public bool SeqIdMode { 
+            get
+            {
+                return (InitialMessageId > 0);
+            } 
+        }
 
         public int InitialMessageId { get; set; }
 
@@ -324,16 +329,18 @@
                             + this.SEP + this.leftPaddedSeqId;
 
             var seqMsgString = msgHeader.PadLeft(msgSize, 'x');
+            Logger.InfoFormat("Sending : {0}", seqMsgString);
             return Encoding.UTF8.GetBytes(seqMsgString);
         }
 
         private Tuple<KeyedMessage<long, byte[]>, int> GenerateProducerData(string topic, long messageId)
         {
             var msgSize = this.config.IsFixedSize ? this.config.MessageSize : 1 + this.rand.Next(this.config.MessageSize);
+            //var message = System.Text.Encoding.Unicode.GetBytes("Hello alan");
             var message = this.config.SeqIdMode
                               ? this.GenerateMessageWithSeqId(
-                                  topic, this.config.InitialMessageId + (this.messagesPerThread * this.threadId) + messageId, msgSize)
-                              : new byte[msgSize];
+                                   topic, this.config.InitialMessageId + (this.messagesPerThread * this.threadId) + messageId, msgSize)
+                               : new byte[msgSize];
             return Tuple.Create(new KeyedMessage<long, byte[]>(topic, messageId, message), message.Length);
         }
 

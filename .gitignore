@@ -3,3 +3,5 @@ bin
 obj
 *.suo
 *.csproj.user
+.DS_Store
+._.DS_Store
